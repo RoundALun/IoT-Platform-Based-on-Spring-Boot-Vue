@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.roundlun.iot.mapper.SysPropertyMapper">
+    
+    <resultMap type="SysProperty" id="SysPropertyResult">
+        <result property="propertyId"    column="property_id"    />
+        <result property="protocolId"    column="protocol_id"    />
+        <result property="propTypeId"    column="prop_type_id"    />
+        <result property="propertyName"    column="property_name"    />
+        <result property="propertyKey"    column="property_key"    />
+        <result property="unit"    column="unit"    />
+        <association property="propType"    column="prop_type_id" javaType="SysPropType" resultMap="SysPropTypeResult" />
+    </resultMap>
+
+    <resultMap type="SysPropType" id="SysPropTypeResult">
+        <result property="propTypeId"    column="prop_type_id"    />
+        <result property="propTypeName"    column="prop_type_name"    />
+        <result property="remark"    column="remark"    />
+    </resultMap>
+
+    <sql id="selectSysPropertyVo">
+        select p.property_id, p.protocol_id, p.prop_type_id, p.property_name, p.property_key, p.unit, t.prop_type_id, t.prop_type_name, t.remark from sys_property p left join sys_prop_type t on p.prop_type_id = t.prop_type_id
+    </sql>
+
+    <select id="selectSysPropertyList" parameterType="SysProperty" resultMap="SysPropertyResult">
+        <include refid="selectSysPropertyVo"/>
+        <where>  
+            <if test="propertyName != null  and propertyName != ''"> and p.property_name like concat('%', #{propertyName}, '%')</if>
+            <if test="protocolId != null"> and p.protocol_id = #{protocolId}</if>
+        </where>
+    </select>
+    
+    <select id="selectSysPropertyByPropertyId" parameterType="Long" resultMap="SysPropertyResult">
+        <include refid="selectSysPropertyVo"/>
+        where property_id = #{propertyId}
+    </select>
+        
+    <insert id="insertSysProperty" parameterType="SysProperty" useGeneratedKeys="true" keyProperty="propertyId">
+        insert into sys_property
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="protocolId != null">protocol_id,</if>
+            <if test="propTypeId != null">prop_type_id,</if>
+            <if test="propertyName != null">property_name,</if>
+            <if test="propertyKey != null">property_key,</if>
+            <if test="unit != null">unit,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="protocolId != null">#{protocolId},</if>
+            <if test="propTypeId != null">#{propTypeId},</if>
+            <if test="propertyName != null">#{propertyName},</if>
+            <if test="propertyKey != null">#{propertyKey},</if>
+            <if test="unit != null">#{unit},</if>
+         </trim>
+    </insert>
+
+    <update id="updateSysProperty" parameterType="SysProperty">
+        update sys_property
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="protocolId != null">protocol_id = #{protocolId},</if>
+            <if test="propTypeId != null">prop_type_id = #{propTypeId},</if>
+            <if test="propertyName != null">property_name = #{propertyName},</if>
+            <if test="propertyKey != null">property_key = #{propertyKey},</if>
+            <if test="unit != null">unit = #{unit},</if>
+        </trim>
+        where property_id = #{propertyId}
+    </update>
+
+    <delete id="deleteSysPropertyByPropertyId" parameterType="Long">
+        delete from sys_property where property_id = #{propertyId}
+    </delete>
+
+    <delete id="deleteSysPropertyByPropertyIds" parameterType="String">
+        delete from sys_property where property_id in 
+        <foreach item="propertyId" collection="array" open="(" separator="," close=")">
+            #{propertyId}
+        </foreach>
+    </delete>
+</mapper>

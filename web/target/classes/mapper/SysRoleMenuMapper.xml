@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.roundlun.iot.mapper.SysRoleMenuMapper">
+    <resultMap type="SysRoleMenu" id="SysRoleMenuResult">
+        <result property='roleMenuId' column="id"/>
+        <result property='roleId' column="role_id"/>
+        <result property='menuId' column="menu_id"/>
+    </resultMap>
+
+    <sql id="selectSysUserVo">
+        select id, role_id, menu_id from sys_role_menu
+    </sql>
+    <insert id="insertSysRoleMenu" parameterType="SysRoleMenu" useGeneratedKeys="true" keyProperty="id">
+        insert into sys_role_menu(role_id, menu_id) values
+        <foreach item="item" index="index" collection="list" separator=",">
+            (#{item.roleId},#{item.menuId})
+        </foreach>
+    </insert>
+    <select id="selectMenuIdListByRoleId" resultType="Integer" >
+        SELECT
+        a.`menu_id`
+        FROM sys_role_menu a, sys_menu b
+        WHERE a.`menu_id` = b.`menu_id`
+        AND b.`is_leaf` = 'Y'
+        AND a.`role_id` = #{roleId}
+    </select>
+
+    <delete id="deleteSysRoleMenusByRoleId" parameterType="String">
+        delete from sys_role_menu where role_id in
+        <foreach collection="array" item="roleId" open="(" separator="," close=")">
+            #{roleId}
+        </foreach>
+    </delete>
+
+
+
+    <!--    <select id="selectSysRoleMenus" resultMap="SysRoleMenuResult">-->
+
+<!--    </select>-->
+
+</mapper>

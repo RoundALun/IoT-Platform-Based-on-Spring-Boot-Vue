@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.roundlun.iot.mapper.SysRoleMapper">
+
+    <resultMap type="SysRole" id="SysRoleResult">
+        <result property="roleId"    column="role_id"    />
+        <result property="roleName"    column="role_name"    />
+        <result property="roleDesc"    column="role_desc"    />
+    </resultMap>
+
+    <sql id="selectSysRoleVo">
+        select role_id, role_name, role_desc from sys_role
+    </sql>
+
+    <select id="selectSysRoleList" parameterType="SysRole" resultMap="SysRoleResult">
+        <include refid="selectSysRoleVo"/>
+        <where>
+            <if test="roleName != null  and roleName != ''"> and role_name like concat('%', #{roleName}, '%')</if>
+            <if test="roleId != null"> and role_id = #{roleId}</if>
+        </where>
+    </select>
+    <select id="selectSysRoleByRoleId" parameterType="Long" resultMap="SysRoleResult">
+        <include refid="selectSysRoleVo"/>
+        <where>
+            and role_id = #{roleId}
+        </where>
+    </select>
+    
+    <select id="selectSysRoleByRoleName" parameterType="String" resultMap="SysRoleResult">
+        <include refid="selectSysRoleVo"/>
+        <where>
+            and role_name = #{roleName}
+        </where>
+    </select>
+    <insert id="insertSysRole" parameterType="SysRole">
+        insert into sys_role
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="roleName != null">role_name,</if>
+            <if test="roleDesc != null">role_desc,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="roleName != null">#{roleName},</if>
+            <if test="roleDesc != null">#{roleDesc},</if>
+        </trim>
+    </insert>
+    <update id="updateSysRole" parameterType="SysRole">
+        update sys_role
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="roleName != null">role_name = #{roleName},</if>
+            <if test="roleDesc != null">role_desc = #{roleDesc},</if>
+        </trim>
+        where role_id = #{roleId}
+    </update>
+    <delete id="deleteSysRoleByRoleId" parameterType="Long">
+        delete from sys_role where role_id = #{roleId}
+    </delete>
+    <delete id="deleteSysRoleByRoleIds" parameterType="String">
+        delete from sys_role where role_id in
+        <foreach  collection="array" item="roleId" open="(" separator="," close=")">
+            #{roleId}
+        </foreach>
+    </delete>
+</mapper>

@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.roundlun.iot.mapper.SysDeviceMapper">
+    
+    <resultMap type="SysDevice" id="SysDeviceResult">
+        <result property="deviceId"    column="device_id"    />
+        <result property="deviceSn"    column="device_sn"    />
+        <result property="devicePwd"    column="device_pwd"    />
+        <result property="userId"    column="user_id"    />
+        <result property="protocolId"    column="protocol_id"    />
+        <association property="protocol"    column="protocol_id" javaType="SysProtocol" resultMap="SysProtocolResult" />
+    </resultMap>
+
+    <resultMap type="SysProtocol" id="SysProtocolResult">
+        <result property="protocolId"    column="protocol_id"    />
+        <result property="protocolName"    column="protocol_name"    />
+    </resultMap>
+
+    <sql id="selectSysDeviceVo">
+        select d.device_id, d.device_sn, d.device_pwd, d.user_id, d.protocol_id, p.protocol_id, p.protocol_name from sys_device d left join sys_protocol p on d.protocol_id = p.protocol_id
+    </sql>
+
+    <select id="selectSysDeviceList" parameterType="SysDevice" resultMap="SysDeviceResult">
+        <include refid="selectSysDeviceVo"/>
+        <where>  
+            <if test="deviceSn != null "> and d.device_sn = #{deviceSn}</if>
+            <if test="userId != null"> and d.user_id = #{userId}</if>
+        </where>
+    </select>
+
+    <select id="selectSysDeviceByDeviceId" parameterType="Long" resultMap="SysDeviceResult">
+        <include refid="selectSysDeviceVo"/>
+        where device_id = #{deviceId}
+    </select>
+
+    <select id="selectSysDeviceByDeviceSn" parameterType="Long" resultMap="SysDeviceResult">
+        <include refid="selectSysDeviceVo"/>
+        where device_sn = #{deviceSN}
+    </select>
+        
+    <insert id="insertSysDevice" parameterType="SysDevice">
+        insert into sys_device
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="deviceSn != null">device_sn,</if>
+            <if test="devicePwd != null">device_pwd,</if>
+            <if test="userId != null">user_id,</if>
+            <if test="protocolId != null">protocol_id,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="deviceSn != null">#{deviceSn},</if>
+            <if test="devicePwd != null">#{devicePwd},</if>
+            <if test="userId != null">#{userId},</if>
+            <if test="protocolId != null">#{protocolId},</if>
+         </trim>
+    </insert>
+
+    <update id="updateSysDevice" parameterType="SysDevice">
+        update sys_device
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="deviceSn != null">device_sn = #{deviceSn},</if>
+            <if test="devicePwd != null">device_pwd = #{devicePwd},</if>
+            <if test="userId != null">user_id = #{userId},</if>
+            <if test="protocolId != null">protocol_id = #{protocolId},</if>
+        </trim>
+        where device_id = #{deviceId}
+    </update>
+
+    <delete id="deleteSysDeviceByDeviceId" parameterType="Long">
+        delete from sys_device where device_id = #{deviceId}
+    </delete>
+
+    <delete id="deleteSysDeviceByDeviceIds" parameterType="String">
+        delete from sys_device where device_id in
+        <foreach item="deviceId" collection="array" open="(" separator="," close=")">
+            #{deviceId}
+        </foreach>
+    </delete>
+</mapper>
