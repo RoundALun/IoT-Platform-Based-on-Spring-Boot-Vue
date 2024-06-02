@@ -132,9 +132,7 @@ void onMqttMessage(int messageSize) {
     char inChar = (char)mqttClient.read();
     Serial.print(inChar);
     inputString += inChar;
-    
-    
-    
+ 
   }
   //控制led灯
     led_control(inputString);
@@ -153,10 +151,10 @@ void led_control(String inputString) {
   const char* propertyKey = doc["propertyKey"]; 
   bool propertyValue = doc["propertyValue"];
    Serial.println(propertyKey);
-   if(propertyKey = "switcher"){
+   if(propertyKey = "light_switcher"){
       if(propertyValue == true){
-    inputString="led_on";
-  }else if(propertyValue == false){
+      inputString="led_on";
+    }else if(propertyValue == false){
     inputString="led_off";
   }
    }

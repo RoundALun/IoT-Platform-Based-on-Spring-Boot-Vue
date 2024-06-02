@@ -20,7 +20,7 @@
             <div class="property-name">{{ item.propertyName + '\t设备SN:' + item.deviceSn }}</div>
             <div class="property-value">
               {{ item.propertyValue + " " + item.unit }}
-              <el-switch v-if="item.propertyKey == 'switcher'" v-model="item.propertyValue"
+              <el-switch v-if="item.propertyKey.includes('switcher') && typeof item.propertyValue === 'boolean'" v-model="item.propertyValue"
                 @change="handleSwitchChange(item.deviceSn, item.propertyKey, item.propertyValue, item)">
               </el-switch>
             </div>
@@ -168,7 +168,7 @@ export default {
           }
           // this.propertyList = this.propertyList.concat(propertyList);
           this.loading = false;
-          console.log(lists);
+          // console.log(lists);
         });
       };
 
